@@ -266,44 +266,6 @@
     #video-call-button i {
       margin-right: 8px;
     }
-
-    /* Video Call Modal */
-    #video-call-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #video-call-modal iframe {
-      width: 90%;
-      height: 90%;
-      border: none;
-      border-radius: 10px;
-    }
-
-    #close-video-call {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: #ff4757;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
   </style>
 </head>
 <body>
@@ -330,12 +292,6 @@
       <i class="fas fa-video"></i> Video Call
     </button>
     <button id="logout-button">Logout</button>
-  </div>
-
-  <!-- Video Call Modal -->
-  <div id="video-call-modal">
-    <button id="close-video-call" onclick="closeVideoCall()">×</button>
-    <iframe id="jitsi-iframe" allow="camera; microphone"></iframe>
   </div>
 
   <!-- Firebase SDK -->
@@ -370,8 +326,6 @@
     const messageInput = document.getElementById("message-input");
     const typingIndicator = document.getElementById("typing-indicator");
     const logoutButton = document.getElementById("logout-button");
-    const videoCallModal = document.getElementById("video-call-modal");
-    const jitsiIframe = document.getElementById("jitsi-iframe");
 
     let username = "";
 
@@ -527,14 +481,7 @@
 
     // Open Video Call
     function openVideoCall() {
-      videoCallModal.style.display = "flex";
-      jitsiIframe.src = "https://8x8.vc/vpaas-magic-cookie-271d68129bcd48ecaae60cea0724b5a3/SampleAppProperAdviceEchoCasually";
-    }
-
-    // Close Video Call
-    function closeVideoCall() {
-      videoCallModal.style.display = "none";
-      jitsiIframe.src = ""; // Stop the iframe from loading
+      window.open("https://8x8.vc/vpaas-magic-cookie-271d68129bcd48ecaae60cea0724b5a3/SampleAppProperAdviceEchoCasually", "_blank");
     }
   </script>
 </body>
