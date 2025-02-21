@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeOne Chat</title>
+  <!-- FontAwesome for Video Call Icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+
+    #auth-container, #chat-container {
+      width: 90%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #auth-container h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 24px;
+      color: #333;
+    }
+
+    #auth-container input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    #auth-container input:focus {
+      border-color: #667eea;
+      outline: none;
+    }
+
+    #auth-container button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    #auth-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    #auth-container p {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    #auth-container p a {
+      color: #667eea;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    #auth-container p a:hover {
+      text-decoration: underline;
+    }
+
+    #chat-container {
+      display: none;
+    }
+
+    #app-name {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    #messages {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-sender {
+      background: #e1f5fe;
+      align-self: flex-start;
+      margin-right: auto;
+      max-width: 70%;
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      animation: fadeIn 0.5s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+
+    .message-recipient {
+      background: #f0f0f0;
+      align-self: flex-end;
+      margin-left: auto;
+      max-width: 70%;
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      animation: fadeIn 0.5s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message-info {
+      font-size: 0.8em;
+      color: #555;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .message-actions {
+      display: flex;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .message-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #667eea;
+      font-size: 0.8em;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .message-actions button:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    #message-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    #message-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    #message-input:focus {
+      border-color: #667eea;
+      outline: none;
+    }
+
+    #send-button {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    #send-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    #typing-indicator {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.5;
+      }
+    }
+
+    #home-button, #logout-button, #video-call-button {
+      margin-top: 10px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    #home-button:hover, #logout-button:hover, #video-call-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    #video-call-button {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+    }
+
+    #video-call-button i {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Authentication Container -->
+  <div id="auth-container">
+    <h2>Sign Up</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="signup-button">Sign Up</button>
+    <p>Already have an account? <a id="toggle-auth">Log In</a></p>
+  </div>
+
+  <!-- Chat Container -->
+  <div id="chat-container">
+    <div id="app-name">WeOne Chat</div>
+    <div id="messages"></div>
+    <div id="typing-indicator"></div>
+    <form id="message-form">
+      <input type="text" id="message-input" placeholder="Type your message..." required />
+      <button type="submit" id="send-button">Send</button>
+    </form>
+    <button id="home-button" onclick="window.location.href='https://newness.com'">Home</button>
+    <button id="video-call-button" onclick="openVideoCall()">
+      <i class="fas fa-video"></i> Video Call
+    </button>
+    <button id="logout-button">Logout</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+    import { getDatabase, ref, push, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQLUzYqaCaFMV74_dmqC2scBJgi0I-rVw",
+      authDomain: "weone-chat-b8ee9.firebaseapp.com",
+      projectId: "weone-chat-b8ee9",
+      storageBucket: "weone-chat-b8ee9.appspot.com",
+      messagingSenderId: "483592524796",
+      appId: "1:483592524796:web:2ec0588f944b1795b99879",
+      measurementId: "G-BTDVK6Z04W",
+      databaseURL: "https://weone-chat-b8ee9-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    const authContainer = document.getElementById("auth-container");
+    const chatContainer = document.getElementById("chat-container");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const signupButton = document.getElementById("signup-button");
+    const toggleAuth = document.getElementById("toggle-auth");
+    const messagesDiv = document.getElementById("messages");
+    const messageForm = document.getElementById("message-form");
+    const messageInput = document.getElementById("message-input");
+    const typingIndicator = document.getElementById("typing-indicator");
+    const logoutButton = document.getElementById("logout-button");
+
+    let username = "";
+
+    // Toggle between Sign Up and Log In forms
+    toggleAuth.addEventListener("click", () => {
+      if (toggleAuth.textContent === "Log In") {
+        toggleAuth.textContent = "Sign Up";
+        signupButton.textContent = "Log In";
+        signupButton.removeEventListener("click", handleSignUp);
+        signupButton.addEventListener("click", handleLogin);
+      } else {
+        toggleAuth.textContent = "Log In";
+        signupButton.textContent = "Sign Up";
+        signupButton.removeEventListener("click", handleLogin);
+        signupButton.addEventListener("click", handleSignUp);
+      }
+    });
+
+    // Handle Sign Up
+    function handleSignUp() {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Sign up successful!");
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+        });
+    }
+
+    // Handle Log In
+    function handleLogin() {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Log in successful!");
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+        });
+    }
+
+    // Initialize Sign Up button
+    signupButton.addEventListener("click", handleSignUp);
+
+    // Handle Authentication State Changes
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        username = user.email.split("@")[0]; // Use email prefix as username
+        authContainer.style.display = "none";
+        chatContainer.style.display = "block";
+        initializeChat();
+      } else {
+        // User is signed out
+        authContainer.style.display = "block";
+        chatContainer.style.display = "none";
+      }
+    });
+
+    // Logout
+    logoutButton.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        alert("Logged out successfully!");
+      }).catch((error) => {
+        alert("Error: " + error.message);
+      });
+    });
+
+    // Initialize Chat Functionality
+    function initializeChat() {
+      const messagesRef = ref(database, "messages");
+      const typingRef = ref(database, `typing/${username}`);
+
+      // Listen for new messages
+      onValue(messagesRef, (snapshot) => {
+        messagesDiv.innerHTML = "";
+        const messages = snapshot.val();
+        for (let id in messages) {
+          const message = messages[id];
+          const messageDiv = document.createElement("div");
+          messageDiv.className = message.username === username ? "message-sender" : "message-recipient";
+          messageDiv.innerHTML = `
+            <span>${message.username}: ${message.text}</span>
+            <div class="message-info">
+              <span>${new Date(message.timestamp).toLocaleTimeString()}</span>
+              <div class="message-actions">
+                <button onclick="editMessage('${id}')">Edit</button>
+                <button onclick="deleteMessage('${id}')">Delete</button>
+              </div>
+            </div>
+          `;
+          messagesDiv.appendChild(messageDiv);
+        }
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+
+      // Send a new message
+      messageForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const messageText = messageInput.value.trim();
+        if (messageText) {
+          push(messagesRef, {
+            username,
+            text: messageText,
+            timestamp: Date.now()
+          });
+          messageInput.value = "";
+          set(typingRef, false);
+        }
+      });
+
+      // Track typing status
+      messageInput.addEventListener("input", () => {
+        set(typingRef, messageInput.value.trim().length > 0);
+      });
+
+      // Listen for typing status
+      onValue(ref(database, "typing"), (snapshot) => {
+        const typingData = snapshot.val();
+        let isSomeoneTyping = false;
+        for (let user in typingData) {
+          if (typingData[user] && user !== username) {
+            typingIndicator.textContent = `${user} is typing...`;
+            isSomeoneTyping = true;
+            break;
+          }
+        }
+        if (!isSomeoneTyping) {
+          typingIndicator.textContent = "";
+        }
+      });
+    }
+
+    // Edit a message
+    window.editMessage = function(id) {
+      const newText = prompt("Edit your message:");
+      if (newText !== null && newText.trim() !== "") {
+        const messageRef = ref(database, `messages/${id}`);
+        update(messageRef, { text: newText.trim() });
+      }
+    };
+
+    // Delete a message
+    window.deleteMessage = function(id) {
+      if (confirm("Are you sure you want to delete this message?")) {
+        const messageRef = ref(database, `messages/${id}`);
+        remove(messageRef);
+      }
+    };
+
+    // Open Video Call
+    function openVideoCall() {
+      const videoCallWindow = window.open("", "Video Call", "width=800,height=600");
+      videoCallWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <script src='https://8x8.vc/vpaas-magic-cookie-271d68129bcd48ecaae60cea0724b5a3/external_api.js' async></script>
+            <style>html, body, #jaas-container { height: 100%; }</style>
+            <script type="text/javascript">
+              window.onload = () => {
+                const api = new JitsiMeetExternalAPI("8x8.vc", {
+                  roomName: "vpaas-magic-cookie-271d68129bcd48ecaae60cea0724b5a3/SampleAppProperAdviceEchoCasually",
+                  parentNode: document.querySelector('#jaas-container'),
+                });
+              }
+            </script>
+          </head>
+          <body><div id="jaas-container" /></body>
+        </html>
+      `);
+      videoCallWindow.document.close();
+    }
+  </script>
+</body>
+</html>
